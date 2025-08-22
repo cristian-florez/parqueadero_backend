@@ -7,4 +7,7 @@ import com.parqueadero.models.Ticket;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
+
+    Ticket findByCodigoBarrasQR(String codigoBarras);
+
 }

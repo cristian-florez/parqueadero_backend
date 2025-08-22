@@ -2,6 +2,7 @@ package com.parqueadero.controllers;
 
 import com.parqueadero.models.Ticket;
 import com.parqueadero.services.TicketService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,7 @@ public class TicketController {
 
     @Autowired
     private TicketService ticketService;
+
 
     @GetMapping
     public Page<Ticket> obtenerTodosLosTickets(
@@ -34,23 +36,25 @@ public class TicketController {
 
     @PostMapping
     public Ticket crearTicket(@RequestBody Ticket ticket) {
+        ticket.setPagado(false);
+        ticket.setFechaHoraEntrada(java.time.LocalDateTime.now());
         return ticketService.guardar(ticket);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Ticket> actualizarTicket(@PathVariable Long id, @RequestBody Ticket ticketDetails) {
-        return ticketService.buscarPorId(id)
-                .map(ticket -> {
-                    ticket.setCodigoBarrasQR(ticketDetails.getCodigoBarrasQR());
-                    ticket.setFechaHoraEntrada(ticketDetails.getFechaHoraEntrada());
-                    ticket.setFechaHoraSalida(ticketDetails.getFechaHoraSalida());
-                    ticket.setPagado(ticketDetails.getPagado());
-                    ticket.setUsuarioRecibio(ticketDetails.getUsuarioRecibio());
-                    ticket.setUsuarioEntrego(ticketDetails.getUsuarioEntrego());
-                    ticket.setVehiculo(ticketDetails.getVehiculo());
-                    return ResponseEntity.ok(ticketService.guardar(ticket));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @PutMapping("/{codigo}")
+    public ResponseEntity<Ticket> actualizarTicket(@PathVariable String codigo, @RequestBody Ticket ticketDetails) {
+        Ticket ticketExistente = ticketService.buscarTicketCodigo(codigo);
+
+        if (ticketExistente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ticketExistente.setFechaHoraSalida(ticketDetails.getFechaHoraSalida());
+        ticketExistente.setPagado(true);
+        ticketExistente.setUsuarioEntrego(ticketDetails.getUsuarioEntrego());
+
+        Ticket actualizado = ticketService.guardar(ticketExistente);
+        return ResponseEntity.ok(actualizado);
     }
 
     @DeleteMapping("/{id}")
