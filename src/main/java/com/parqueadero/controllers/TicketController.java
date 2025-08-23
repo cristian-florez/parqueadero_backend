@@ -1,6 +1,7 @@
 package com.parqueadero.controllers;
 
 import com.parqueadero.models.Ticket;
+import com.parqueadero.services.PagoService;
 import com.parqueadero.services.TicketService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
+    @Autowired
+    private PagoService pagoService;
+
 
     @GetMapping
     public Page<Ticket> obtenerTodosLosTickets(
@@ -34,6 +38,12 @@ public class TicketController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/codigo/{codigo}")
+    public ResponseEntity<Ticket> obtenerTicketPorCodigo(@PathVariable String codigo) {
+        return ResponseEntity.ok(ticketService.buscarTicketCodigo(codigo));
+
+    }
+
     @PostMapping
     public Ticket crearTicket(@RequestBody Ticket ticket) {
         ticket.setPagado(false);
@@ -41,17 +51,23 @@ public class TicketController {
         return ticketService.guardar(ticket);
     }
 
-    @PutMapping("/{codigo}")
-    public ResponseEntity<Ticket> actualizarTicket(@PathVariable String codigo, @RequestBody Ticket ticketDetails) {
+    @PutMapping("/salida/{codigo}")
+    public ResponseEntity<Ticket> actualizarTicket(@PathVariable String codigo, @RequestBody Ticket ticket) {
         Ticket ticketExistente = ticketService.buscarTicketCodigo(codigo);
 
         if (ticketExistente == null) {
             return ResponseEntity.notFound().build();
         }
 
-        ticketExistente.setFechaHoraSalida(ticketDetails.getFechaHoraSalida());
+        ticketExistente.setFechaHoraSalida(java.time.LocalDateTime.now());
         ticketExistente.setPagado(true);
-        ticketExistente.setUsuarioEntrego(ticketDetails.getUsuarioEntrego());
+        ticketExistente.setUsuarioEntrego(ticket.getUsuarioEntrego());
+        ticketExistente.setPago(pagoService.calcularTotal(
+            codigo,
+            ticketExistente.getVehiculo().getTipo(),
+             ticketExistente.getFechaHoraEntrada(),
+             java.time.LocalDateTime.now()));
+
 
         Ticket actualizado = ticketService.guardar(ticketExistente);
         return ResponseEntity.ok(actualizado);

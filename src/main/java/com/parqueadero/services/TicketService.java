@@ -22,7 +22,7 @@ public class TicketService {
         Pageable pageableOrdenado = PageRequest.of(
             pageable.getPageNumber(),
             pageable.getPageSize(),
-            Sort.by("fechaHoraEntrada").descending() // <-- Cambia "id" por el campo que quieras ordenar
+            Sort.by("fechaHoraEntrada").descending() 
         );
         return ticketRepository.findAll(pageableOrdenado);
     }
@@ -41,7 +41,7 @@ public class TicketService {
 
     public Ticket buscarTicketCodigo(String codigoBarras) {
         if (codigoBarras != null && !codigoBarras.isEmpty()) {
-            return ticketRepository.findByCodigoBarrasQR(codigoBarras);
+            return ticketRepository.findByCodigoBarrasQRAndPagado(codigoBarras, false);
         }
         return null;
     }

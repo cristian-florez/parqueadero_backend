@@ -1,6 +1,5 @@
 package com.parqueadero.models;
 
-import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,17 +16,17 @@ public class Tarifa {
     private long id;
 
     private String tipoVehiculo;
-    private BigDecimal precioDia;
+    private Integer precioDia;
     
     public Tarifa() {
     }
 
-    public Tarifa(String tipoVehiculo, BigDecimal precioDia) {
+    public Tarifa(String tipoVehiculo, Integer precioDia) {
         this.tipoVehiculo = tipoVehiculo;
         this.precioDia = precioDia;
     }
 
-    public Tarifa(long id, String tipoVehiculo, BigDecimal precioDia) {
+    public Tarifa(long id, String tipoVehiculo, Integer precioDia) {
         this.id = id;
         this.tipoVehiculo = tipoVehiculo;
         this.precioDia = precioDia;
@@ -49,11 +48,11 @@ public class Tarifa {
         this.tipoVehiculo = tipoVehiculo;
     }
 
-    public BigDecimal getPrecioDia() {
+    public Integer getPrecioDia() {
         return precioDia;
     }
 
-    public void setPrecioDia(BigDecimal precioDia) {
+    public void setPrecioDia(Integer precioDia) {
         this.precioDia = precioDia;
     }
 

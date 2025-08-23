@@ -1,6 +1,5 @@
 package com.parqueadero.models;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,7 +20,7 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private BigDecimal total;
+    private Integer total;
     private LocalDateTime fechaHora;
 
     @OneToOne
@@ -32,13 +31,13 @@ public class Pago {
     public Pago() {
     }
 
-    public Pago(BigDecimal total, LocalDateTime fechaHora, Ticket ticket) {
+    public Pago(Integer total, LocalDateTime fechaHora, Ticket ticket) {
         this.total = total;
         this.fechaHora = fechaHora;
         this.ticket = ticket;
     }
 
-    public Pago(Long id, BigDecimal total, LocalDateTime fechaHora, Ticket ticket) {
+    public Pago(Long id, Integer total, LocalDateTime fechaHora, Ticket ticket) {
         this.id = id;
         this.total = total;
         this.fechaHora = fechaHora;
@@ -53,11 +52,11 @@ public class Pago {
         this.id = id;
     }
 
-    public BigDecimal getTotal() {
+    public Integer getTotal() {
         return total;
     }
 
-    public void setTotal(BigDecimal total) {
+    public void setTotal(Integer total) {
         this.total = total;
     }
 

@@ -7,4 +7,6 @@ import com.parqueadero.models.Tarifa;
 
 @Repository
 public interface TarifaRepository extends JpaRepository<Tarifa, Long> {
+
+    Tarifa findByTipoVehiculo(String tipoVehiculo);
 }

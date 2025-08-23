@@ -10,4 +10,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Ticket findByCodigoBarrasQR(String codigoBarras);
 
+    Ticket findByCodigoBarrasQRAndPagado(String codigoBarras, boolean pagado);
+
 }
