@@ -1,10 +1,12 @@
 package com.parqueadero.services;
 
 import com.parqueadero.models.Usuario;
+import com.parqueadero.models.DTOS.TicketCierreTurno;
 import com.parqueadero.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +15,9 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private TicketService ticketService;
 
     public List<Usuario> buscarTodos() {
         return usuarioRepository.findAll();
@@ -31,6 +36,13 @@ public class UsuarioService {
     }
 
     public Usuario login(String nombre, String cedula) {
-        return usuarioRepository.findByNombreAndCedula(nombre, cedula);
+        Usuario usuario = usuarioRepository.findByNombreAndCedula(nombre, cedula);
+        usuario.setFechaInicioSesion(LocalDateTime.now());
+        return usuario;
+    }
+
+    public TicketCierreTurno cerrarTurno(LocalDateTime fechaInicio, LocalDateTime fechaCierre) {
+        
+        return ticketService.ticketCierreTurno(fechaInicio, fechaCierre);
     }
 }

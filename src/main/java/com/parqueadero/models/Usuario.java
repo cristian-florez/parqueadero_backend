@@ -1,5 +1,7 @@
 package com.parqueadero.models;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,19 +18,22 @@ public class Usuario {
 
     private String nombre;
     private String cedula;
+    private LocalDateTime fechaInicioSesion;
 
     public Usuario() {
     }
 
-    public Usuario(String nombre, String cedula, String celular, String rol, String contrasena, String usuario) {
+    public Usuario(String nombre, String cedula, String celular, String rol, String contrasena, String usuario, LocalDateTime fechaInicioSesion) {
         this.nombre = nombre;
         this.cedula = cedula;
+        this.fechaInicioSesion = fechaInicioSesion;
     }
 
-    public Usuario(Long id, String nombre, String cedula, String celular, String rol, String contrasena, String usuario) {
+    public Usuario(Long id, String nombre, String cedula, String celular, String rol, String contrasena, String usuario, LocalDateTime fechaInicioSesion) {
         this.id = id;
         this.nombre = nombre;
         this.cedula = cedula;
+        this.fechaInicioSesion = fechaInicioSesion;
     }
 
     public Long getId() {
@@ -53,6 +58,14 @@ public class Usuario {
 
     public void setCedula(String cedula) {
         this.cedula = cedula;
+    }
+
+    public LocalDateTime getFechaInicioSesion() {
+        return fechaInicioSesion;
+    }
+
+    public void setFechaInicioSesion(LocalDateTime fechaInicioSesion) {
+        this.fechaInicioSesion = fechaInicioSesion;
     }
 
 }

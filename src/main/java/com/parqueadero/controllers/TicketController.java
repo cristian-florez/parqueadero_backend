@@ -1,13 +1,17 @@
 package com.parqueadero.controllers;
 
 import com.parqueadero.models.Ticket;
+import com.parqueadero.models.DTOS.TicketCierreTurno;
 import com.parqueadero.services.PagoService;
 import com.parqueadero.services.TicketService;
+
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +52,7 @@ public class TicketController {
     public Ticket crearTicket(@RequestBody Ticket ticket) {
         ticket.setPagado(false);
         ticket.setFechaHoraEntrada(java.time.LocalDateTime.now());
+        ticket.setCodigoBarrasQR(ticketService.generarCodigo(ticket.getVehiculo().getPlaca(), ticket.getFechaHoraEntrada()));
         return ticketService.guardar(ticket);
     }
 
@@ -82,4 +87,13 @@ public class TicketController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/cierre-turno")
+    public ResponseEntity<TicketCierreTurno> obtenerDatosImpresion(
+        @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fin) {
+            return ResponseEntity.ok(ticketService.ticketCierreTurno(inicio, fin));
+    }
+
+
 }

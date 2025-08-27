@@ -29,4 +29,8 @@ public class TarifaService {
     public void eliminarPorId(Long id) {
         tarifaRepository.deleteById(id);
     }
+
+    public Integer buscarPorTipoVehiculo(String tipoVehiculo) {
+        return tarifaRepository.findPrecioByTipoVehiculo(tipoVehiculo);
+    }
 }
