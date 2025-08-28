@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,7 @@ import com.parqueadero.models.Ticket;
 import com.parqueadero.models.Vehiculo;
 
 @Repository
-public interface TicketRepository extends JpaRepository<Ticket, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
 
     // Busca un ticket por su código de barras QR
     Ticket findByCodigoBarrasQR(String codigoBarras);

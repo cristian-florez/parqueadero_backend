@@ -30,9 +30,17 @@ public class TicketController {
     @GetMapping
     public Page<Ticket> obtenerTodosLosTickets(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size) {
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) String codigo,
+        @RequestParam(required = false) String placa,
+        @RequestParam(required = false) String tipo,
+        @RequestParam(required = false) String usuarioRecibio,
+        @RequestParam(required = false) String usuarioEntrego,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
+        @RequestParam(required = false) Boolean pagado) {
             Pageable pageable = PageRequest.of(page, size);
-            return ticketService.buscarTodos(pageable);
+            return ticketService.buscarTodos(pageable, codigo, placa, tipo, usuarioRecibio, usuarioEntrego, fechaInicio, fechaFin, pagado);
     }
 
     @GetMapping("/{id}")

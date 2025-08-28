@@ -4,6 +4,7 @@ import com.parqueadero.models.Ticket;
 import com.parqueadero.models.DTOS.TicketCierreTurno;
 import com.parqueadero.repositories.TicketRepository;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,13 +22,22 @@ public class TicketService {
     @Autowired
     private TicketRepository ticketRepository;
 
-    public Page<Ticket> buscarTodos(Pageable pageable) {
+    public Page<Ticket> buscarTodos(Pageable pageable, String codigo, String placa, String tipo, String usuarioRecibio, String usuarioEntrego, LocalDateTime fechaInicio, LocalDateTime fechaFin, Boolean pagado) {
         Pageable pageableOrdenado = PageRequest.of(
             pageable.getPageNumber(),
             pageable.getPageSize(),
-            Sort.by("fechaHoraEntrada").descending() 
+            Sort.by("fechaHoraEntrada").descending()
         );
-        return ticketRepository.findAll(pageableOrdenado);
+
+        Specification<Ticket> spec = TicketSpecification.hasCodigo(codigo)
+            .and(TicketSpecification.hasPlaca(placa))
+            .and(TicketSpecification.hasTipo(tipo))
+            .and(TicketSpecification.hasUsuarioRecibio(usuarioRecibio))
+            .and(TicketSpecification.hasUsuarioEntrego(usuarioEntrego))
+            .and(TicketSpecification.isPagado(pagado))
+            .and(TicketSpecification.fechaEntradaBetween(fechaInicio, fechaFin));
+
+        return ticketRepository.findAll(spec, pageableOrdenado);
     }
 
     public Optional<Ticket> buscarPorId(Long id) {
