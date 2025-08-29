@@ -14,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200") // Ajusta si usas otro dominio
+@CrossOrigin(origins = "http://localhost:4200")
 public class QzSignatureController {
 
     private final PrivateKey qzPrivateKey;
@@ -27,7 +27,7 @@ public class QzSignatureController {
         }
 
         // Firma con RSA-SHA256
-        Signature sig = Signature.getInstance("SHA256withRSA");
+        Signature sig = Signature.getInstance("SHA1withRSA");
         sig.initSign(qzPrivateKey);
         sig.update(toSign.getBytes(StandardCharsets.UTF_8));
 
