@@ -76,12 +76,22 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
         @Param("fechaCierreTurno") LocalDateTime fechaCierreTurno);
 
     // Suma el total de pagos de los tickets que entraron durante un turno (rango de fechas)
-    @Query("SELECT SUM(p.total) FROM Ticket t " +
-           "JOIN t.pago p " +
-           "WHERE t.fechaHoraSalida BETWEEN :fechaInicioTurno AND :fechaCierreTurno")
-    Double totalCierreTurno(
-        @Param("fechaInicioTurno") LocalDateTime fechaInicioTurno,
-        @Param("fechaCierreTurno") LocalDateTime fechaCierreTurno);
+       @Query("SELECT SUM(p.total) " +
+              "FROM Ticket t " +
+              "JOIN t.pago p " +
+              "JOIN t.vehiculo v " +
+              "WHERE " +
+              " (t.fechaHoraSalida BETWEEN :fechaInicioTurno AND :fechaCierreTurno) " +
+              " OR " +
+              " (v.placa LIKE CONCAT('%', :mensualidad, '%') " +
+              "  AND t.fechaHoraEntrada BETWEEN :fechaInicioTurno AND :fechaCierreTurno)")
+       Double totalCierreTurno(
+              @Param("fechaInicioTurno") LocalDateTime fechaInicioTurno,
+              @Param("fechaCierreTurno") LocalDateTime fechaCierreTurno,
+              @Param("mensualidad") String mensualidad);
+
+
+
 
     // Devuelve todos los vehículos que todavía no tienen registrada una fecha de salida
     @Query("SELECT t.vehiculo FROM Ticket t WHERE t.fechaHoraSalida IS NULL")

@@ -45,6 +45,12 @@ public class TicketService {
     }
 
     public Ticket guardar(Ticket ticket) {
+        // If a Pago object is present and its ID is null (meaning it's a new Pago)
+        // and the ticket is not yet persisted (ticket.getId() == null),
+        // set the ticket on the pago object before saving.
+        if (ticket.getPago() != null && ticket.getPago().getId() == null) {
+            ticket.getPago().setTicket(ticket); // Set the owning side of the relationship
+        }
         return ticketRepository.save(ticket);
     }
 
@@ -81,7 +87,7 @@ public class TicketService {
         cierreTurno.setTotalVehiculosQueEntraron(ticketRepository.vehiculosQueEntraron(fechaInicio, fechaCierre));
         cierreTurno.setTotalVehiculosQueSalieron(ticketRepository.vehiculosQueSalieron(fechaInicio, fechaCierre));
         
-        Double totalAPagar = ticketRepository.totalCierreTurno(fechaInicio, fechaCierre);
+        Double totalAPagar = ticketRepository.totalCierreTurno(fechaInicio, fechaCierre, "MENSUALIDAD");
         cierreTurno.setTotalAPagar(totalAPagar != null ? totalAPagar : 0.0);
         
         cierreTurno.setVehiculosEnParqueadero(ticketRepository.findVehiculosSinSalida());

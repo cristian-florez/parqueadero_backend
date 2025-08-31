@@ -58,7 +58,10 @@ public class TicketController {
 
     @PostMapping
     public Ticket crearTicket(@RequestBody Ticket ticket) {
-        ticket.setPagado(false);
+        if (ticket.getPagado() == null) {
+            ticket.setPagado(false);
+        }
+
         ticket.setFechaHoraEntrada(java.time.LocalDateTime.now());
         ticket.setCodigoBarrasQR(ticketService.generarCodigo(ticket.getVehiculo().getPlaca(), ticket.getFechaHoraEntrada()));
         return ticketService.guardar(ticket);
