@@ -7,9 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/api/tarifas")
@@ -42,12 +39,8 @@ public class TarifaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Tarifa> actualizarTarifa(@PathVariable Long id, @RequestBody Tarifa tarifaDetails) {
-        return tarifaService.buscarPorId(id)
-                .map(tarifa -> {
-                    tarifa.setTipoVehiculo(tarifaDetails.getTipoVehiculo());
-                    tarifa.setPrecioDia(tarifaDetails.getPrecioDia());
-                    return ResponseEntity.ok(tarifaService.guardar(tarifa));
-                })
+        return tarifaService.actualizarTarifa(id, tarifaDetails)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

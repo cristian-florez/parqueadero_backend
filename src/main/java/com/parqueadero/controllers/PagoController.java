@@ -1,10 +1,7 @@
 package com.parqueadero.controllers;
 
 import com.parqueadero.models.Pago;
-import com.parqueadero.models.Ticket;
 import com.parqueadero.services.PagoService;
-import com.parqueadero.services.TicketService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +14,6 @@ public class PagoController {
 
     @Autowired
     private PagoService pagoService;
-
-    @Autowired
-    private TicketService ticketService;
 
     @GetMapping
     public List<Pago> obtenerTodosLosPagos() {
@@ -40,13 +34,8 @@ public class PagoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Pago> actualizarPago(@PathVariable Long id, @RequestBody Pago pagoDetails) {
-        return pagoService.buscarPorId(id)
-                .map(pago -> {
-                    pago.setTotal(pagoDetails.getTotal());
-                    pago.setFechaHora(pagoDetails.getFechaHora());
-                    pago.setTicket(pagoDetails.getTicket());
-                    return ResponseEntity.ok(pagoService.guardar(pago));
-                })
+        return pagoService.actualizarPago(id, pagoDetails)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -62,18 +51,8 @@ public class PagoController {
 
     @GetMapping("/pago/{codigo}")
     public ResponseEntity<Pago> obtenerPago(@PathVariable String codigo) {
-
-        Ticket ticket = ticketService.buscarTicketCodigo(codigo);
-        if (ticket == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Pago pago = pagoService.calcularTotal(
-            codigo,
-            ticket.getVehiculo().getTipo(),
-            ticket.getFechaHoraEntrada(),
-            java.time.LocalDateTime.now()
-        );
-        return ResponseEntity.ok(pago);
+        return pagoService.obtenerPagoPorCodigo(codigo)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

@@ -29,4 +29,25 @@ public class VehiculoService {
     public void eliminarPorId(Long id) {
         vehiculoRepository.deleteById(id);
     }
+
+    public Optional<Vehiculo> actualizarVehiculo(Long id, Vehiculo vehiculoDetails) {
+        return vehiculoRepository.findById(id).map(vehiculo -> {
+            vehiculo.setPlaca(vehiculoDetails.getPlaca());
+            vehiculo.setTipo(vehiculoDetails.getTipo());
+            return vehiculoRepository.save(vehiculo);
+        });
+    }
+
+    public Vehiculo findByPlaca(String placa) {
+        return vehiculoRepository.findByPlaca(placa);
+    }
+
+    public Vehiculo findOrCreateVehiculo(String placa, String tipo) {
+        Vehiculo vehiculo = findByPlaca(placa);
+        if (vehiculo == null) {
+            vehiculo = new Vehiculo(placa, tipo);
+            guardar(vehiculo);
+        }
+        return vehiculo;
+    }
 }

@@ -3,7 +3,6 @@ package com.parqueadero.controllers;
 import com.parqueadero.models.CierreTurno;
 import com.parqueadero.models.DTOS.TicketCierreTurno;
 import com.parqueadero.services.CierreTurnoService;
-import com.parqueadero.services.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cierre-turno")
@@ -24,45 +21,13 @@ public class CierreTurnoController {
     @Autowired
     private CierreTurnoService cierreTurnoService;
 
-    @Autowired
-    private TicketService ticketService;
-
     @PostMapping
     public ResponseEntity<TicketCierreTurno> crearYGuardarCierre(
         @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fin,
         @RequestParam("usuario") String nombreUsuario) {
 
-        // 1. Calcular el DTO como antes
-        TicketCierreTurno dto = ticketService.ticketCierreTurno(inicio, fin);
-
-        // 2. Mapear el DTO a la nueva entidad CierreTurno
-        CierreTurno nuevoCierre = new CierreTurno();
-        nuevoCierre.setFechaCreacion(LocalDateTime.now());
-        nuevoCierre.setFechaInicioTurno(inicio);
-        nuevoCierre.setFechaFinTurno(fin != null ? fin : LocalDateTime.now());
-        nuevoCierre.setNombreUsuario(nombreUsuario);
-        nuevoCierre.setTotalIngresos(dto.getTotalAPagar());
-
-        if (dto.getTotalVehiculosQueEntraron() != null) {
-            nuevoCierre.setTotalVehiculosEntraron(dto.getTotalVehiculosQueEntraron().size());
-        }
-        if (dto.getTotalVehiculosQueSalieron() != null) {
-            nuevoCierre.setTotalVehiculosSalieron(dto.getTotalVehiculosQueSalieron().size());
-        }
-        if (dto.getVehiculosEnParqueadero() != null) {
-            nuevoCierre.setVehiculosRestantes(dto.getVehiculosEnParqueadero().size());
-        }
-
-        // Mapear detalles a String
-        nuevoCierre.setDetalleEntrantes(formatDetalle(dto.getTipoVehiculosEntrantes()));
-        nuevoCierre.setDetalleSalientes(formatDetalle(dto.getTipoVehiculosSaliente()));
-        nuevoCierre.setDetalleRestantes(formatDetalle(dto.getTipoVehiculosParqueadero()));
-
-        // 3. Guardar la nueva entidad
-        cierreTurnoService.guardarCierreTurno(nuevoCierre);
-
-        // 4. Devolver el DTO original al frontend
+        TicketCierreTurno dto = cierreTurnoService.crearYGuardarCierre(inicio, fin, nombreUsuario);
         return ResponseEntity.ok(dto);
     }
 
@@ -75,8 +40,10 @@ public class CierreTurnoController {
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fin,
         @RequestParam(required = false) String nombreUsuario) {
+
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
+
         return ResponseEntity.ok(cierreTurnoService.obtenerTodosLosCierres(pageable, inicio, fin, nombreUsuario));
     }
 
@@ -85,23 +52,5 @@ public class CierreTurnoController {
         return cierreTurnoService.obtenerCierrePorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    // Helper para formatear los detalles
-    private String formatDetalle(List<Object> detalle) {
-        if (detalle == null || detalle.isEmpty()) {
-            return "";
-        }
-        return detalle.stream()
-                .map(item -> {
-                    if (item instanceof Object[]) {
-                        Object[] array = (Object[]) item;
-                        if (array.length >= 2) {
-                            return array[0].toString() + ": " + array[1].toString();
-                        }
-                    }
-                    return item.toString();
-                })
-                .collect(Collectors.joining(", "));
     }
 }

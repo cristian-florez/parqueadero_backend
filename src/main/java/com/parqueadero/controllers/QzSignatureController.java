@@ -11,7 +11,7 @@ import java.security.Signature;
 import java.util.Base64;
 import java.util.Map;
 
-@RestController
+//@RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")

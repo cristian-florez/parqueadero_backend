@@ -34,12 +34,8 @@ public class VehiculoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Vehiculo> actualizarVehiculo(@PathVariable Long id, @RequestBody Vehiculo vehiculoDetails) {
-        return vehiculoService.buscarPorId(id)
-                .map(vehiculo -> {
-                    vehiculo.setPlaca(vehiculoDetails.getPlaca());
-                    vehiculo.setTipo(vehiculoDetails.getTipo());
-                    return ResponseEntity.ok(vehiculoService.guardar(vehiculo));
-                })
+        return vehiculoService.actualizarVehiculo(id, vehiculoDetails)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 

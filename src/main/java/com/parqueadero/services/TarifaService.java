@@ -33,4 +33,12 @@ public class TarifaService {
     public Integer buscarPorTipoVehiculo(String tipoVehiculo) {
         return tarifaRepository.findPrecioByTipoVehiculo(tipoVehiculo);
     }
+
+    public Optional<Tarifa> actualizarTarifa(Long id, Tarifa tarifaDetails) {
+        return tarifaRepository.findById(id).map(tarifa -> {
+            tarifa.setTipoVehiculo(tarifaDetails.getTipoVehiculo());
+            tarifa.setPrecioDia(tarifaDetails.getPrecioDia());
+            return tarifaRepository.save(tarifa);
+        });
+    }
 }

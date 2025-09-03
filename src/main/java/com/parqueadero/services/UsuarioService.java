@@ -35,14 +35,25 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
-    public Usuario login(String nombre, String cedula) {
+    public Optional<Usuario> actualizarUsuario(Long id, Usuario usuarioDetails) {
+        return usuarioRepository.findById(id).map(usuario -> {
+            usuario.setNombre(usuarioDetails.getNombre());
+            usuario.setCedula(usuarioDetails.getCedula());
+            return usuarioRepository.save(usuario);
+        });
+    }
+
+    public Optional<Usuario> login(String nombre, String cedula) {
         Usuario usuario = usuarioRepository.findByNombreAndCedula(nombre, cedula);
-        usuario.setFechaInicioSesion(LocalDateTime.now());
-        return usuario;
+        if (usuario != null) {
+            usuario.setFechaInicioSesion(LocalDateTime.now());
+            usuarioRepository.save(usuario);
+            return Optional.of(usuario);
+        }
+        return Optional.empty();
     }
 
     public TicketCierreTurno cerrarTurno(LocalDateTime fechaInicio, LocalDateTime fechaCierre) {
-        
         return ticketService.ticketCierreTurno(fechaInicio, fechaCierre);
     }
 }

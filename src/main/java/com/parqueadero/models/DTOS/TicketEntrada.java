@@ -2,10 +2,13 @@ package com.parqueadero.models.DTOS;
 
 import java.time.LocalDateTime;
 
+// Dejamos el DTO como un record plano y simple.
 public record TicketEntrada(
-    String codigoBarras,
     String placa,
     String tipoVehiculo,
+    String usuarioRecibio,
     LocalDateTime fechaHoraEntrada,
-    String usuarioRecibio) {}
-
+    Integer dias,
+    Boolean pagado,
+    Integer total
+) {}

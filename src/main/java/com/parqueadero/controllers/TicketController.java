@@ -1,8 +1,8 @@
 package com.parqueadero.controllers;
 
 import com.parqueadero.models.Ticket;
+import com.parqueadero.models.DTOS.TicketEntrada;
 import com.parqueadero.models.DTOS.TicketCierreTurno;
-import com.parqueadero.services.PagoService;
 import com.parqueadero.services.TicketService;
 
 import java.time.LocalDateTime;
@@ -22,9 +22,6 @@ public class TicketController {
 
     @Autowired
     private TicketService ticketService;
-
-    @Autowired
-    private PagoService pagoService;
 
 
     @GetMapping
@@ -57,36 +54,15 @@ public class TicketController {
     }
 
     @PostMapping
-    public Ticket crearTicket(@RequestBody Ticket ticket) {
-        if (ticket.getPagado() == null) {
-            ticket.setPagado(false);
-        }
-
-        ticket.setFechaHoraEntrada(java.time.LocalDateTime.now());
-        ticket.setCodigoBarrasQR(ticketService.generarCodigo(ticket.getVehiculo().getPlaca(), ticket.getFechaHoraEntrada()));
-        return ticketService.guardar(ticket);
+    public Ticket crearTicket(@RequestBody TicketEntrada ticket) {
+        return ticketService.crearTicket(ticket);
     }
 
     @PutMapping("/salida/{codigo}")
     public ResponseEntity<Ticket> actualizarTicket(@PathVariable String codigo, @RequestBody Ticket ticket) {
-        Ticket ticketExistente = ticketService.buscarTicketCodigo(codigo);
-
-        if (ticketExistente == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        ticketExistente.setFechaHoraSalida(java.time.LocalDateTime.now());
-        ticketExistente.setPagado(true);
-        ticketExistente.setUsuarioEntrego(ticket.getUsuarioEntrego());
-        ticketExistente.setPago(pagoService.calcularTotal(
-            codigo,
-            ticketExistente.getVehiculo().getTipo(),
-             ticketExistente.getFechaHoraEntrada(),
-             java.time.LocalDateTime.now()));
-
-
-        Ticket actualizado = ticketService.guardar(ticketExistente);
-        return ResponseEntity.ok(actualizado);
+        return ticketService.actualizarTicketSalida(codigo, ticket)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

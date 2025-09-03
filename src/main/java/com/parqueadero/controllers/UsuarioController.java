@@ -7,9 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -37,12 +34,8 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioDetails) {
-        return usuarioService.buscarPorId(id)
-                .map(usuario -> {
-                    usuario.setNombre(usuarioDetails.getNombre());
-                    usuario.setCedula(usuarioDetails.getCedula());
-                    return ResponseEntity.ok(usuarioService.guardar(usuario));
-                })
+        return usuarioService.actualizarUsuario(id, usuarioDetails)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -57,8 +50,9 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public Usuario login(@RequestBody Usuario usuario) {
-        return usuarioService.login(usuario.getNombre(), usuario.getCedula());
+    public ResponseEntity<Usuario> login(@RequestBody Usuario usuario) {
+        return usuarioService.login(usuario.getNombre(), usuario.getCedula())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    
 }
