@@ -1,20 +1,24 @@
 package com.parqueadero.controllers;
 
+import com.parqueadero.dtos.tickets.TicketEntradaRequest;
+import com.parqueadero.dtos.tickets.TicketMensualidadRequest;
+import com.parqueadero.dtos.tickets.TicketResponse;
+import com.parqueadero.dtos.tickets.TicketSalidaRequest;
+import com.parqueadero.mappers.TicketMapper;
 import com.parqueadero.models.Ticket;
-import com.parqueadero.models.DTOS.TicketEntrada;
-import com.parqueadero.models.DTOS.TicketCierreTurno;
 import com.parqueadero.services.TicketService;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -23,64 +27,117 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
+    @Autowired
+    private TicketMapper ticketMapper;
 
+    // Buscar todos los tickets
     @GetMapping
-    public Page<Ticket> obtenerTodosLosTickets(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(required = false) String codigo,
-        @RequestParam(required = false) String placa,
-        @RequestParam(required = false) String tipo,
-        @RequestParam(required = false) String usuarioRecibio,
-        @RequestParam(required = false) String usuarioEntrego,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
-        @RequestParam(required = false) Boolean pagado) {
+    public ResponseEntity<?> obtenerTodosLosTickets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String codigo,
+            @RequestParam(required = false) String placa,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String usuarioRecibio,
+            @RequestParam(required = false) String usuarioEntrego,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
+            @RequestParam(required = false) Boolean pagado) {
+        try {
             Pageable pageable = PageRequest.of(page, size);
-            return ticketService.buscarTodos(pageable, codigo, placa, tipo, usuarioRecibio, usuarioEntrego, fechaInicio, fechaFin, pagado);
+            Page<Ticket> tickets = ticketService.buscarTodos(
+                    pageable, codigo, placa, tipo, usuarioRecibio, usuarioEntrego, fechaInicio, fechaFin, pagado);
+
+            if (tickets.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay tickets disponibles");
+            }
+
+            Page<TicketResponse> response = tickets.map(ticketMapper::toResponse);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener tickets: " + e.getMessage());
+        }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Ticket> obtenerTicketPorId(@PathVariable Long id) {
-        return ticketService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // Buscar ticket por ID
+    @GetMapping("/id/{id}")
+    public ResponseEntity<?> obtenerTicketPorId(@PathVariable Long id) {
+        try {
+            Optional<Ticket> ticketOpt = ticketService.buscarPorId(id);
+            if (ticketOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket con ID " + id + " no encontrado");
+            }
+            return ResponseEntity.ok(ticketMapper.toResponse(ticketOpt.get()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener ticket: " + e.getMessage());
+        }
     }
 
+    // Buscar ticket por código
     @GetMapping("/codigo/{codigo}")
-    public ResponseEntity<Ticket> obtenerTicketPorCodigo(@PathVariable String codigo) {
-        return ResponseEntity.ok(ticketService.buscarTicketCodigo(codigo));
-
+    public ResponseEntity<?> obtenerTicketPorCodigo(@PathVariable String codigo) {
+        try {
+            Ticket ticket = ticketService.buscarTicketCodigo(codigo);
+            if (ticket == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket con código " + codigo + " no encontrado");
+            }
+            return ResponseEntity.ok(ticketMapper.toResponse(ticket));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener ticket: " + e.getMessage());
+        }
     }
 
-    @PostMapping
-    public Ticket crearTicket(@RequestBody TicketEntrada ticket) {
-        return ticketService.crearTicket(ticket);
+    // Crear ticket entrada vehículo
+    @PostMapping("/entrada")
+    public ResponseEntity<?> crearTicket(@RequestBody TicketEntradaRequest ticketRequest) {
+        try {
+            TicketResponse response = ticketMapper.toResponse(ticketService.ticketEntradaVehiculo(ticketRequest));
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear ticket: " + e.getMessage());
+        }
     }
 
-    @PutMapping("/salida/{codigo}")
-    public ResponseEntity<Ticket> actualizarTicket(@PathVariable String codigo, @RequestBody Ticket ticket) {
-        return ticketService.actualizarTicketSalida(codigo, ticket)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    // Crear ticket mensualidad
+    @PostMapping("/mensualidad")
+    public ResponseEntity<?> mensualidadTicket(@RequestBody TicketMensualidadRequest ticketRequest) {
+        try {
+            TicketResponse response = ticketMapper.toResponse(ticketService.ticketMensualidad(ticketRequest));
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear ticket: " + e.getMessage());
+        }
     }
 
+    // Actualizar salida ticket
+    @PutMapping("/salida")
+    public ResponseEntity<?> salidaTicket(@RequestBody TicketSalidaRequest ticketRequest) {
+        try {
+            TicketResponse response = ticketMapper.toResponse(ticketService.actualizarTicketSalida(ticketRequest));
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar ticket: " + e.getMessage());
+        }
+    }
+
+    // Eliminar ticket
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> eliminarTicket(@PathVariable Long id) {
-        return ticketService.buscarPorId(id)
-                .map(ticket -> {
-                    ticketService.eliminarPorId(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> eliminarTicket(@PathVariable Long id) {
+        try {
+            Optional<Ticket> ticketOpt = ticketService.buscarPorId(id);
+            if (ticketOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket con ID " + id + " no encontrado");
+            }
+            ticketService.eliminarPorId(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al eliminar ticket: " + e.getMessage());
+        }
     }
-
-    @GetMapping("/cierre-turno")
-    public ResponseEntity<TicketCierreTurno> obtenerDatosImpresion(
-        @RequestParam("inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fin) {
-            return ResponseEntity.ok(ticketService.ticketCierreTurno(inicio, fin));
-    }
-
-
 }

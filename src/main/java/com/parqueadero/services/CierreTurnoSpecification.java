@@ -13,13 +13,13 @@ public class CierreTurnoSpecification {
                 return criteriaBuilder.isTrue(criteriaBuilder.literal(true)); // No filter
             }
             if (inicio != null && fin != null) {
-                return criteriaBuilder.between(root.get("fechaCreacion"), inicio, fin);
+                return criteriaBuilder.between(root.get("fechaInicioTurno"), inicio, fin);
             }
             if (inicio != null) {
-                return criteriaBuilder.greaterThanOrEqualTo(root.get("fechaCreacion"), inicio);
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("fechaInicioTurno"), inicio);
             }
             // fin != null
-            return criteriaBuilder.lessThanOrEqualTo(root.get("fechaCreacion"), fin);
+            return criteriaBuilder.lessThanOrEqualTo(root.get("fechaInicioTurno"), fin);
         };
     }
 

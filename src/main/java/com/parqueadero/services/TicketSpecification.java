@@ -13,7 +13,7 @@ public class TicketSpecification {
             if (codigo == null || codigo.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("codigoBarrasQR")), "%" + codigo.toLowerCase() + "%");
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("codigo")), "%" + codigo.toLowerCase() + "%");
         };
     }
 
@@ -40,7 +40,7 @@ public class TicketSpecification {
             if (usuarioRecibio == null || usuarioRecibio.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("usuarioRecibio")), "%" + usuarioRecibio.toLowerCase() + "%");
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("usuarioRecibio").get("nombre")), "%" + usuarioRecibio.toLowerCase() + "%");
         };
     }
 
@@ -49,7 +49,7 @@ public class TicketSpecification {
             if (usuarioEntrego == null || usuarioEntrego.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.like(criteriaBuilder.lower(root.get("usuarioEntrego")), "%" + usuarioEntrego.toLowerCase() + "%");
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("usuarioEntrego").get("nombre")), "%" + usuarioEntrego.toLowerCase() + "%");
         };
     }
 
@@ -58,7 +58,7 @@ public class TicketSpecification {
             if (pagado == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("pagado"), pagado);
+            return criteriaBuilder.equal(root.get("pago").get("estado"), pagado);
         };
     }
 

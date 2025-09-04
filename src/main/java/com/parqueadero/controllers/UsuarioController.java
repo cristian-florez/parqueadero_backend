@@ -1,8 +1,10 @@
 package com.parqueadero.controllers;
 
+import com.parqueadero.dtos.usuarios.UsuarioLogin;
 import com.parqueadero.models.Usuario;
 import com.parqueadero.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,44 +17,55 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    // Obtener todos los usuarios
     @GetMapping
-    public List<Usuario> obtenerTodosLosUsuarios() {
-        return usuarioService.buscarTodos();
+    public ResponseEntity<?> obtenerTodosLosUsuarios() {
+        try {
+            List<Usuario> usuarios = usuarioService.buscarTodos();
+            if (usuarios.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay usuarios registrados");
+            }
+            return ResponseEntity.ok(usuarios);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener usuarios: " + e.getMessage());
+        }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
-        return usuarioService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
+    // Crear usuario
     @PostMapping
-    public Usuario crearUsuario(@RequestBody Usuario usuario) {
-        return usuarioService.guardar(usuario);
+    public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario) {
+        try {
+            Usuario nuevoUsuario = usuarioService.guardar(usuario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear usuario: " + e.getMessage());
+        }
     }
 
+    // Actualizar usuario
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioDetails) {
-        return usuarioService.actualizarUsuario(id, usuarioDetails)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioDetails) {
+        try {
+            return usuarioService.actualizarUsuario(id, usuarioDetails)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("Usuario con ID " + id + " no encontrado"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar usuario: " + e.getMessage());
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> eliminarUsuario(@PathVariable Long id) {
-        return usuarioService.buscarPorId(id)
-                .map(usuario -> {
-                    usuarioService.eliminarPorId(id);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
+    // Login de usuario
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@RequestBody Usuario usuario) {
-        return usuarioService.login(usuario.getNombre(), usuario.getCedula())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> login(@RequestBody UsuarioLogin usuario) {
+        try {
+            return usuarioService.login(usuario)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("Credenciales incorrectas o usuario no encontrado"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en login: " + e.getMessage());
+        }
     }
+
 }

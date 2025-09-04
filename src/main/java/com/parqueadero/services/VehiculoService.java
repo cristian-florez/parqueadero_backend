@@ -30,6 +30,15 @@ public class VehiculoService {
         vehiculoRepository.deleteById(id);
     }
 
+    public Vehiculo crearVehiculo(String placa, String tipo) {
+        Vehiculo vehiculo = new Vehiculo();
+
+        vehiculo.setPlaca(placa);
+        vehiculo.setTipo(tipo);
+        
+        return vehiculoRepository.save(vehiculo);
+    }
+
     public Optional<Vehiculo> actualizarVehiculo(Long id, Vehiculo vehiculoDetails) {
         return vehiculoRepository.findById(id).map(vehiculo -> {
             vehiculo.setPlaca(vehiculoDetails.getPlaca());
@@ -38,16 +47,7 @@ public class VehiculoService {
         });
     }
 
-    public Vehiculo findByPlaca(String placa) {
-        return vehiculoRepository.findByPlaca(placa);
-    }
-
-    public Vehiculo findOrCreateVehiculo(String placa, String tipo) {
-        Vehiculo vehiculo = findByPlaca(placa);
-        if (vehiculo == null) {
-            vehiculo = new Vehiculo(placa, tipo);
-            guardar(vehiculo);
-        }
-        return vehiculo;
+    public boolean findByPlaca(String placa) {
+        return vehiculoRepository.existsByPlaca(placa);
     }
 }

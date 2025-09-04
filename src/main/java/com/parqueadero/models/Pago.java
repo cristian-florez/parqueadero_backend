@@ -20,6 +20,7 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Boolean estado;
     private Integer total;
     private LocalDateTime fechaHora;
 
@@ -31,13 +32,14 @@ public class Pago {
     public Pago() {
     }
 
-    public Pago(Integer total, LocalDateTime fechaHora, Ticket ticket) {
+    public Pago(Boolean estado, Integer total, LocalDateTime fechaHora, Ticket ticket) {
+        this.estado = estado;
         this.total = total;
         this.fechaHora = fechaHora;
         this.ticket = ticket;
     }
 
-    public Pago(Long id, Integer total, LocalDateTime fechaHora, Ticket ticket) {
+    public Pago(Long id, Boolean estado, Integer total, LocalDateTime fechaHora, Ticket ticket) {
         this.id = id;
         this.total = total;
         this.fechaHora = fechaHora;
@@ -50,6 +52,14 @@ public class Pago {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
     }
 
     public Integer getTotal() {

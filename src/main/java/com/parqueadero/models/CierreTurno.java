@@ -14,15 +14,9 @@ public class CierreTurno {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime fechaCreacion;
     private LocalDateTime fechaInicioTurno;
     private LocalDateTime fechaFinTurno;
-
-    private int totalVehiculosEntraron;
-    private int totalVehiculosSalieron;
-    private double totalIngresos;
-    private int vehiculosRestantes;
-
+    private Integer totalIngresos;
     private String detalleEntrantes;
     private String detalleSalientes;
     private String detalleRestantes;
@@ -31,7 +25,15 @@ public class CierreTurno {
     public CierreTurno() {
     }
 
-    // Getters y Setters
+    public CierreTurno(LocalDateTime fechaInicioTurno, LocalDateTime fechaFinTurno, Integer totalIngresos, String detalleEntrantes, String detalleSalientes, String detalleRestantes, String nombreUsuario) {
+        this.fechaInicioTurno = fechaInicioTurno;
+        this.fechaFinTurno = fechaFinTurno;
+        this.totalIngresos = totalIngresos;
+        this.detalleEntrantes = detalleEntrantes;
+        this.detalleSalientes = detalleSalientes;
+        this.detalleRestantes = detalleRestantes;
+        this.nombreUsuario = nombreUsuario;
+    }
 
     public Long getId() {
         return id;
@@ -39,14 +41,6 @@ public class CierreTurno {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
     }
 
     public LocalDateTime getFechaInicioTurno() {
@@ -65,36 +59,12 @@ public class CierreTurno {
         this.fechaFinTurno = fechaFinTurno;
     }
 
-    public int getTotalVehiculosEntraron() {
-        return totalVehiculosEntraron;
-    }
-
-    public void setTotalVehiculosEntraron(int totalVehiculosEntraron) {
-        this.totalVehiculosEntraron = totalVehiculosEntraron;
-    }
-
-    public int getTotalVehiculosSalieron() {
-        return totalVehiculosSalieron;
-    }
-
-    public void setTotalVehiculosSalieron(int totalVehiculosSalieron) {
-        this.totalVehiculosSalieron = totalVehiculosSalieron;
-    }
-
-    public double getTotalIngresos() {
+    public Integer getTotalIngresos() {
         return totalIngresos;
     }
 
-    public void setTotalIngresos(double totalIngresos) {
+    public void setTotalIngresos(Integer totalIngresos) {
         this.totalIngresos = totalIngresos;
-    }
-
-    public int getVehiculosRestantes() {
-        return vehiculosRestantes;
-    }
-
-    public void setVehiculosRestantes(int vehiculosRestantes) {
-        this.vehiculosRestantes = vehiculosRestantes;
     }
 
     public String getDetalleEntrantes() {

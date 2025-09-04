@@ -1,17 +1,20 @@
 package com.parqueadero.services;
 
+import com.parqueadero.dtos.cierreTurno.TicketCierreTurno;
+import com.parqueadero.dtos.vehiculos.TotalVehiculosDTO;
 import com.parqueadero.models.CierreTurno;
-import com.parqueadero.models.DTOS.TicketCierreTurno;
+import com.parqueadero.models.Usuario;
 import com.parqueadero.repositories.CierreTurnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,64 +26,74 @@ public class CierreTurnoService {
     @Autowired
     private TicketService ticketService;
 
-    public TicketCierreTurno crearYGuardarCierre(LocalDateTime inicio, LocalDateTime fin, String nombreUsuario) {
-        // 1. Calcular el DTO
-        TicketCierreTurno dto = ticketService.ticketCierreTurno(inicio, fin);
+    @Autowired
+    private UsuarioService usuarioService;
 
-        // 2. Mapear DTO a entidad
+    // logica para crear un ticket de cierre de turno
+    public TicketCierreTurno ticketCierreTurno(long idUsuarioLogueado) {
+
+        Usuario usuario = usuarioService.buscarPorId(idUsuarioLogueado);
+
+        LocalDateTime fechaInicio = usuario.getFechaInicioSesion();
+        LocalDateTime fechaCierre = LocalDateTime.now();
+
+        TicketCierreTurno cierreTurno = ticketService.generarDatosCierre(fechaInicio, fechaCierre);
+
+        return cierreTurno;
+    }
+
+    @Transactional
+    public TicketCierreTurno crearYGuardarCierre(long idUsuarioLogueado) {
+
+        TicketCierreTurno dto = ticketCierreTurno(idUsuarioLogueado);
+        Usuario usuario = usuarioService.buscarPorId(idUsuarioLogueado);
+        if (usuario == null) {
+            throw new NoSuchElementException("Usuario en ticket cierre con ID " + idUsuarioLogueado + " no encontrado");
+        }
+
+        // mapeamos el ticketCierre con el modelo para poder crear registro en la bd
         CierreTurno nuevoCierre = new CierreTurno();
-        nuevoCierre.setFechaCreacion(LocalDateTime.now());
-        nuevoCierre.setFechaInicioTurno(inicio);
-        nuevoCierre.setFechaFinTurno(fin != null ? fin : LocalDateTime.now());
-        nuevoCierre.setNombreUsuario(nombreUsuario);
+
+        if(dto.getFechaInicio() == null) {
+            throw new NoSuchElementException("el usuario no registra fecha de inicio de turno");
+        }
+        nuevoCierre.setFechaInicioTurno(dto.getFechaInicio());
+        nuevoCierre.setFechaFinTurno(dto.getFechaCierre());
         nuevoCierre.setTotalIngresos(dto.getTotalAPagar());
+        nuevoCierre.setDetalleEntrantes(formatearDetalle(dto.getListaTiposVehiculosEntrantes()));
+        nuevoCierre.setDetalleSalientes(formatearDetalle(dto.getListaTiposVehiculosSalientes()));
+        nuevoCierre.setDetalleRestantes(formatearDetalle(dto.getListaTiposVehiculosParqueadero()));
+        nuevoCierre.setNombreUsuario(usuario.getNombre());
 
-        if (dto.getTotalVehiculosQueEntraron() != null) {
-            nuevoCierre.setTotalVehiculosEntraron(dto.getTotalVehiculosQueEntraron().size());
-        }
-        if (dto.getTotalVehiculosQueSalieron() != null) {
-            nuevoCierre.setTotalVehiculosSalieron(dto.getTotalVehiculosQueSalieron().size());
-        }
-        if (dto.getVehiculosEnParqueadero() != null) {
-            nuevoCierre.setVehiculosRestantes(dto.getVehiculosEnParqueadero().size());
-        }
+        usuarioService.eliminarFechaInicioSesion(usuario);
 
-        nuevoCierre.setDetalleEntrantes(formatDetalle(dto.getTipoVehiculosEntrantes()));
-        nuevoCierre.setDetalleSalientes(formatDetalle(dto.getTipoVehiculosSaliente()));
-        nuevoCierre.setDetalleRestantes(formatDetalle(dto.getTipoVehiculosParqueadero()));
 
-        // 3. Guardar
         cierreTurnoRepository.save(nuevoCierre);
 
-        // 4. Retornar DTO (para frontend)
+        // Retornar DTO (para frontend)
         return dto;
     }
 
-    public Page<CierreTurno> obtenerTodosLosCierres(Pageable pageable, LocalDateTime inicio, LocalDateTime fin, String nombreUsuario) {
-        Specification<CierreTurno> spec = Specification.where(CierreTurnoSpecification.fechaCreacionBetween(inicio, fin))
-                                                    .and(CierreTurnoSpecification.hasNombreUsuario(nombreUsuario));
+    public Page<CierreTurno> obtenerTodosLosCierres(Pageable pageable, LocalDateTime inicio, LocalDateTime fin,
+                                                    String nombreUsuario) {
+        Specification<CierreTurno> spec = Specification
+                .where(CierreTurnoSpecification.fechaCreacionBetween(inicio, fin))
+                .and(CierreTurnoSpecification.hasNombreUsuario(nombreUsuario));
         return cierreTurnoRepository.findAll(spec, pageable);
     }
 
-    public Optional<CierreTurno> obtenerCierrePorId(Long id) {
-        return cierreTurnoRepository.findById(id);
+    public CierreTurno obtenerCierrePorId(Long id) {
+        return cierreTurnoRepository.findById(id).orElseThrow(() -> new NoSuchElementException("CierreTurno con ID " + id + " no encontrado"));
     }
 
-    // Helper para formatear los detalles
-    private String formatDetalle(List<Object> detalle) {
+    // este metodo se creo para que la lista que obtengo de mi ticketCierre
+    // lo pueda convertir en un string y poder guardarlo en la base de datos
+    private String formatearDetalle(List<TotalVehiculosDTO> detalle) {
         if (detalle == null || detalle.isEmpty()) {
             return "";
         }
         return detalle.stream()
-                .map(item -> {
-                    if (item instanceof Object[]) {
-                        Object[] array = (Object[]) item;
-                        if (array.length >= 2) {
-                            return array[0].toString() + ": " + array[1].toString();
-                        }
-                    }
-                    return item.toString();
-                })
+                .map(dto -> dto.getTipo() + ": " + dto.getCantidad())
                 .collect(Collectors.joining(", "));
     }
 }

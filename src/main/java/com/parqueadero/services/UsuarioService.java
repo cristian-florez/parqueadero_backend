@@ -1,7 +1,7 @@
 package com.parqueadero.services;
 
+import com.parqueadero.dtos.usuarios.UsuarioLogin;
 import com.parqueadero.models.Usuario;
-import com.parqueadero.models.DTOS.TicketCierreTurno;
 import com.parqueadero.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,15 +16,12 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private TicketService ticketService;
-
     public List<Usuario> buscarTodos() {
         return usuarioRepository.findAll();
     }
 
-    public Optional<Usuario> buscarPorId(Long id) {
-        return usuarioRepository.findById(id);
+    public Usuario buscarPorId(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
     }
 
     public Usuario guardar(Usuario usuario) {
@@ -43,17 +40,21 @@ public class UsuarioService {
         });
     }
 
-    public Optional<Usuario> login(String nombre, String cedula) {
-        Usuario usuario = usuarioRepository.findByNombreAndCedula(nombre, cedula);
-        if (usuario != null) {
-            usuario.setFechaInicioSesion(LocalDateTime.now());
-            usuarioRepository.save(usuario);
-            return Optional.of(usuario);
+    public Optional<Usuario> login(UsuarioLogin usuario) {
+        Usuario usuarioModel = usuarioRepository.findByNombreAndCedula(usuario.getNombre(), usuario.getCedula());
+
+        if (usuarioModel != null) {
+            usuarioModel.setFechaInicioSesion(LocalDateTime.now());
+            usuarioRepository.save(usuarioModel);
+            return Optional.of(usuarioModel);
         }
         return Optional.empty();
     }
 
-    public TicketCierreTurno cerrarTurno(LocalDateTime fechaInicio, LocalDateTime fechaCierre) {
-        return ticketService.ticketCierreTurno(fechaInicio, fechaCierre);
+    public Usuario eliminarFechaInicioSesion(Usuario usuario) {
+
+        usuario.setFechaInicioSesion(null);
+        return usuarioRepository.save(usuario);
     }
+
 }
