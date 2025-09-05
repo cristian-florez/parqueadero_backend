@@ -40,13 +40,14 @@ public class TicketController {
             @RequestParam(required = false) String tipo,
             @RequestParam(required = false) String usuarioRecibio,
             @RequestParam(required = false) String usuarioEntrego,
+            @RequestParam(required = false) String parqueadero,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
             @RequestParam(required = false) Boolean pagado) {
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Ticket> tickets = ticketService.buscarTodos(
-                    pageable, codigo, placa, tipo, usuarioRecibio, usuarioEntrego, fechaInicio, fechaFin, pagado);
+                    pageable, codigo, placa, tipo, usuarioRecibio, usuarioEntrego, fechaInicio, fechaFin, pagado, parqueadero);
 
             if (tickets.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay tickets disponibles");

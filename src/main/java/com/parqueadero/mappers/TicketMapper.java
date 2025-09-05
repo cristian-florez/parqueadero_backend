@@ -15,5 +15,6 @@ public interface TicketMapper {
     @Mapping(source = "usuarioEntrego.nombre", target = "usuarioEntrego")
     @Mapping(source = "pago.estado", target = "estadoPago")
     @Mapping(source = "pago.total", target = "totalPagar")
+    @Mapping(source = "parqueadero.nombre", target = "parqueadero")
     TicketResponse toResponse(Ticket ticket);
 }

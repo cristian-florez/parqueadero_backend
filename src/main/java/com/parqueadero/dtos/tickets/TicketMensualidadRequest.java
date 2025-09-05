@@ -8,17 +8,19 @@ public class TicketMensualidadRequest {
     private long usuarioId;
     private String placa;
     private String tipoVehiculo;
+    private String parqueadero;
     private int dias;
     private Integer total;
 
     public TicketMensualidadRequest() {
     }
 
-    public TicketMensualidadRequest(LocalDateTime fechaHoraEntrada, long usuarioId, String placa, String tipoVehiculo, int dias, Integer total) {
+    public TicketMensualidadRequest(LocalDateTime fechaHoraEntrada, long usuarioId, String placa, String tipoVehiculo, String parqueadero, int dias, Integer total) {
         this.fechaHoraEntrada = fechaHoraEntrada;
         this.usuarioId = usuarioId;
         this.placa = placa;
         this.tipoVehiculo = tipoVehiculo;
+        this.parqueadero = parqueadero;
         this.dias = dias;
         this.total = total;
     }
@@ -53,6 +55,14 @@ public class TicketMensualidadRequest {
 
     public void setTipoVehiculo(String tipoVehiculo) {
         this.tipoVehiculo = tipoVehiculo;
+    }
+
+    public String getParqueadero() {
+        return parqueadero;
+    }
+
+    public void setParqueadero(String parqueadero) {
+        this.parqueadero = parqueadero;
     }
 
     public int getDias() {

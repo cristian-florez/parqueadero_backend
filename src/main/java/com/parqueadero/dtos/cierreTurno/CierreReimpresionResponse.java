@@ -8,24 +8,21 @@ public class CierreReimpresionResponse {
     private LocalDateTime fechaInicioTurno;
     private LocalDateTime fechaFinTurno;
     private Integer totalIngresos;
-    private String detalleEntrantes;
-    private String detalleSalientes;
-    private String detalleRestantes;
+    private String detallesJson;
+
 
     public CierreReimpresionResponse() {
     }
 
     public CierreReimpresionResponse(String nombreUsuario, LocalDateTime fechaInicioTurno,
                                      LocalDateTime fechaFinTurno, Integer totalIngresos,
-                                     String detalleEntrantes, String detalleSalientes,
-                                     String detalleRestantes) {
+                                     String detallesJson) {
         this.nombreUsuario = nombreUsuario;
         this.fechaInicioTurno = fechaInicioTurno;
         this.fechaFinTurno = fechaFinTurno;
         this.totalIngresos = totalIngresos;
-        this.detalleEntrantes = detalleEntrantes;
-        this.detalleSalientes = detalleSalientes;
-        this.detalleRestantes = detalleRestantes;
+        this.detallesJson = detallesJson;
+
     }
 
     public String getNombreUsuario() {
@@ -60,27 +57,12 @@ public class CierreReimpresionResponse {
         this.totalIngresos = totalIngresos;
     }
 
-    public String getDetalleEntrantes() {
-        return detalleEntrantes;
+    public String getDetallesJson() {
+        return detallesJson;
     }
 
-    public void setDetalleEntrantes(String detalleEntrantes) {
-        this.detalleEntrantes = detalleEntrantes;
+    public void setDetallesJson(String detallesJson) {
+        this.detallesJson = detallesJson;
     }
 
-    public String getDetalleSalientes() {
-        return detalleSalientes;
-    }
-
-    public void setDetalleSalientes(String detalleSalientes) {
-        this.detalleSalientes = detalleSalientes;
-    }
-
-    public String getDetalleRestantes() {
-        return detalleRestantes;
-    }
-
-    public void setDetalleRestantes(String detalleRestantes) {
-        this.detalleRestantes = detalleRestantes;
-    }
 }

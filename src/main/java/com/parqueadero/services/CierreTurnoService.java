@@ -1,5 +1,8 @@
 package com.parqueadero.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.parqueadero.dtos.cierreTurno.TicketCierreTurno;
 import com.parqueadero.dtos.vehiculos.TotalVehiculosDTO;
 import com.parqueadero.models.CierreTurno;
@@ -54,16 +57,15 @@ public class CierreTurnoService {
         // mapeamos el ticketCierre con el modelo para poder crear registro en la bd
         CierreTurno nuevoCierre = new CierreTurno();
 
-        if(dto.getFechaInicio() == null) {
+        if (dto.getFechaInicio() == null) {
             throw new NoSuchElementException("el usuario no registra fecha de inicio de turno");
         }
         nuevoCierre.setFechaInicioTurno(dto.getFechaInicio());
         nuevoCierre.setFechaFinTurno(dto.getFechaCierre());
-        nuevoCierre.setTotalIngresos(dto.getTotalAPagar());
-        nuevoCierre.setDetalleEntrantes(formatearDetalle(dto.getListaTiposVehiculosEntrantes()));
-        nuevoCierre.setDetalleSalientes(formatearDetalle(dto.getListaTiposVehiculosSalientes()));
-        nuevoCierre.setDetalleRestantes(formatearDetalle(dto.getListaTiposVehiculosParqueadero()));
         nuevoCierre.setNombreUsuario(usuario.getNombre());
+        nuevoCierre.setTotalIngresos(dto.getTotal());
+
+        nuevoCierre.setDetallesJson(convertirDetallesAJson(dto));
 
         usuarioService.eliminarFechaInicioSesion(usuario);
 
@@ -87,13 +89,15 @@ public class CierreTurnoService {
     }
 
     // este metodo se creo para que la lista que obtengo de mi ticketCierre
-    // lo pueda convertir en un string y poder guardarlo en la base de datos
-    private String formatearDetalle(List<TotalVehiculosDTO> detalle) {
-        if (detalle == null || detalle.isEmpty()) {
-            return "";
+    //lo puedo convertir en un json
+    private String convertirDetallesAJson(TicketCierreTurno dto) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            // Módulo necesario para que Jackson maneje correctamente fechas como LocalDateTime
+            mapper.registerModule(new JavaTimeModule());
+            return mapper.writeValueAsString(dto.getDetallesPorParqueadero());
+        } catch (JsonProcessingException e) {
+            return "{\"error\":\"No se pudo serializar el detalle del cierre\"}";
         }
-        return detalle.stream()
-                .map(dto -> dto.getTipo() + ": " + dto.getCantidad())
-                .collect(Collectors.joining(", "));
     }
 }

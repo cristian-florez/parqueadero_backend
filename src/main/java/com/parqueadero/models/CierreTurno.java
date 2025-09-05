@@ -1,11 +1,7 @@
 package com.parqueadero.models;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 
 @Entity
 public class CierreTurno {
@@ -16,24 +12,18 @@ public class CierreTurno {
 
     private LocalDateTime fechaInicioTurno;
     private LocalDateTime fechaFinTurno;
-    private Integer totalIngresos;
-    private String detalleEntrantes;
-    private String detalleSalientes;
-    private String detalleRestantes;
+    private Integer totalIngresos; // Este campo guardará la suma de todos los parqueaderos
     private String nombreUsuario;
+
+    // CAMBIO PRINCIPAL: Un único campo para guardar todos los detalles.
+    @Lob // Anotación para Large Object, ideal para texto largo.
+    @Column(columnDefinition = "TEXT")
+    private String detallesJson;
 
     public CierreTurno() {
     }
 
-    public CierreTurno(LocalDateTime fechaInicioTurno, LocalDateTime fechaFinTurno, Integer totalIngresos, String detalleEntrantes, String detalleSalientes, String detalleRestantes, String nombreUsuario) {
-        this.fechaInicioTurno = fechaInicioTurno;
-        this.fechaFinTurno = fechaFinTurno;
-        this.totalIngresos = totalIngresos;
-        this.detalleEntrantes = detalleEntrantes;
-        this.detalleSalientes = detalleSalientes;
-        this.detalleRestantes = detalleRestantes;
-        this.nombreUsuario = nombreUsuario;
-    }
+    // Getters y Setters
 
     public Long getId() {
         return id;
@@ -67,35 +57,19 @@ public class CierreTurno {
         this.totalIngresos = totalIngresos;
     }
 
-    public String getDetalleEntrantes() {
-        return detalleEntrantes;
-    }
-
-    public void setDetalleEntrantes(String detalleEntrantes) {
-        this.detalleEntrantes = detalleEntrantes;
-    }
-
-    public String getDetalleSalientes() {
-        return detalleSalientes;
-    }
-
-    public void setDetalleSalientes(String detalleSalientes) {
-        this.detalleSalientes = detalleSalientes;
-    }
-
-    public String getDetalleRestantes() {
-        return detalleRestantes;
-    }
-
-    public void setDetalleRestantes(String detalleRestantes) {
-        this.detalleRestantes = detalleRestantes;
-    }
-
     public String getNombreUsuario() {
         return nombreUsuario;
     }
 
     public void setNombreUsuario(String nombreUsuario) {
         this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getDetallesJson() {
+        return detallesJson;
+    }
+
+    public void setDetallesJson(String detallesJson) {
+        this.detallesJson = detallesJson;
     }
 }

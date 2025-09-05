@@ -5,6 +5,7 @@ public class TicketEntradaRequest {
     private String placa;
     private String tipoVehiculo;
     private long usuarioRecibioId;
+    private String parqueadero;
 
     public TicketEntradaRequest() {
     }
@@ -37,5 +38,13 @@ public class TicketEntradaRequest {
 
     public void setUsuarioRecibioId(long usuarioRecibioId) {
         this.usuarioRecibioId = usuarioRecibioId;
+    }
+
+    public String getParqueadero() {
+        return parqueadero;
+    }
+
+    public void setParqueadero(String parqueadero) {
+        this.parqueadero = parqueadero;
     }
 }

@@ -13,11 +13,12 @@ public class TicketResponse {
     private Integer totalPagar;
     private String usuarioRecibio;
     private String usuarioEntrego;
+    private  String parqueadero;
 
     public TicketResponse() {
     }
 
-    public TicketResponse(String codigo, String placa, String tipoVehiculo, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida, Boolean estadoPago, Integer totalPagar, String usuarioRecibio, String usuarioEntrego) {
+    public TicketResponse(String codigo, String placa, String tipoVehiculo, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida, Boolean estadoPago, Integer totalPagar, String usuarioRecibio, String usuarioEntrego, String parqueadero) {
         this.codigo = codigo;
         this.placa = placa;
         this.tipoVehiculo = tipoVehiculo;
@@ -27,6 +28,7 @@ public class TicketResponse {
         this.totalPagar = totalPagar;
         this.usuarioRecibio = usuarioRecibio;
         this.usuarioEntrego = usuarioEntrego;
+        this.parqueadero = parqueadero;
     }
 
     public String getCodigo() {
@@ -99,5 +101,13 @@ public class TicketResponse {
 
     public void setUsuarioEntrego(String usuarioEntrego) {
         this.usuarioEntrego = usuarioEntrego;
+    }
+
+    public String getParqueadero() {
+        return parqueadero;
+    }
+
+    public void setParqueadero(String parqueadero) {
+        this.parqueadero = parqueadero;
     }
 }

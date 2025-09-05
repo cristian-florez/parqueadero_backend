@@ -53,6 +53,15 @@ public class TicketSpecification {
         };
     }
 
+    public static Specification<Ticket> hasParqueadero(String parqueadero) {
+        return (root, query, criteriaBuilder) -> {
+            if (parqueadero == null || parqueadero.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get("parqueadero").get("nombre")), "%" + parqueadero.toLowerCase() + "%");
+        };
+    }
+
     public static Specification<Ticket> isPagado(Boolean pagado) {
         return (root, query, criteriaBuilder) -> {
             if (pagado == null) {

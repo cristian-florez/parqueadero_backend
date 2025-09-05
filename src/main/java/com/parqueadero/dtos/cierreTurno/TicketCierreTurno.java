@@ -1,43 +1,23 @@
 package com.parqueadero.dtos.cierreTurno;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
-import com.parqueadero.dtos.vehiculos.TotalVehiculosDTO;
-import com.parqueadero.models.Vehiculo;
+import java.util.Map;
 
 public class TicketCierreTurno {
 
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaCierre;
-    private List<Vehiculo> listaVehiculosEntrantes;
-    private List<Vehiculo> listaVehiculosSalientes;
-    private Integer totalAPagar;
-    private List<Vehiculo> vehiculosEnParqueadero;
-    private List<TotalVehiculosDTO> listaTiposVehiculosEntrantes;
-    private List<TotalVehiculosDTO> listaTiposVehiculosSalientes;
-    private List<TotalVehiculosDTO> listaTiposVehiculosParqueadero;
+    private Integer total;
+    private Map<String, DetalleParqueaderoCierre> detallesPorParqueadero;
 
     public TicketCierreTurno() {
     }
 
-    public TicketCierreTurno(LocalDateTime fechaInicio, LocalDateTime fechaCierre,
-                             List<Vehiculo> listaVehiculosEntrantes,
-                             List<Vehiculo> listaVehiculosSalientes,
-                             Integer totalAPagar,
-                             List<Vehiculo> vehiculosEnParqueadero,
-                             List<TotalVehiculosDTO> listaTiposVehiculosEntrantes,
-                             List<TotalVehiculosDTO> listaTiposVehiculosSalientes,
-                             List<TotalVehiculosDTO> listaTiposVehiculosParqueadero) {
+    public TicketCierreTurno(LocalDateTime fechaInicio, LocalDateTime fechaCierre, Integer total, Map<String, DetalleParqueaderoCierre> detallesPorParqueadero) {
         this.fechaInicio = fechaInicio;
         this.fechaCierre = fechaCierre;
-        this.listaVehiculosEntrantes = listaVehiculosEntrantes;
-        this.listaVehiculosSalientes = listaVehiculosSalientes;
-        this.totalAPagar = totalAPagar;
-        this.vehiculosEnParqueadero = vehiculosEnParqueadero;
-        this.listaTiposVehiculosEntrantes = listaTiposVehiculosEntrantes;
-        this.listaTiposVehiculosSalientes = listaTiposVehiculosSalientes;
-        this.listaTiposVehiculosParqueadero = listaTiposVehiculosParqueadero;
+        this.total = total;
+        this.detallesPorParqueadero = detallesPorParqueadero;
     }
 
     public LocalDateTime getFechaInicio() {
@@ -56,59 +36,19 @@ public class TicketCierreTurno {
         this.fechaCierre = fechaCierre;
     }
 
-    public List<Vehiculo> getListaVehiculosEntrantes() {
-        return listaVehiculosEntrantes;
+    public Integer getTotal() {
+        return total;
     }
 
-    public void setListaVehiculosEntrantes(List<Vehiculo> listaVehiculosEntrantes) {
-        this.listaVehiculosEntrantes = listaVehiculosEntrantes;
+    public void setTotal(Integer total) {
+        this.total = total;
     }
 
-    public List<Vehiculo> getListaVehiculosSalientes() {
-        return listaVehiculosSalientes;
+    public Map<String, DetalleParqueaderoCierre> getDetallesPorParqueadero() {
+        return detallesPorParqueadero;
     }
 
-    public void setListaVehiculosSalientes(List<Vehiculo> listaVehiculosSalientes) {
-        this.listaVehiculosSalientes = listaVehiculosSalientes;
-    }
-
-    public Integer getTotalAPagar() {
-        return totalAPagar;
-    }
-
-    public void setTotalAPagar(Integer totalAPagar) {
-        this.totalAPagar = totalAPagar;
-    }
-
-    public List<Vehiculo> getVehiculosEnParqueadero() {
-        return vehiculosEnParqueadero;
-    }
-
-    public void setVehiculosEnParqueadero(List<Vehiculo> vehiculosEnParqueadero) {
-        this.vehiculosEnParqueadero = vehiculosEnParqueadero;
-    }
-
-    public List<TotalVehiculosDTO> getListaTiposVehiculosEntrantes() {
-        return listaTiposVehiculosEntrantes;
-    }
-
-    public void setListaTiposVehiculosEntrantes(List<TotalVehiculosDTO> listaTiposVehiculosEntrantes) {
-        this.listaTiposVehiculosEntrantes = listaTiposVehiculosEntrantes;
-    }
-
-    public List<TotalVehiculosDTO> getListaTiposVehiculosSalientes() {
-        return listaTiposVehiculosSalientes;
-    }
-
-    public void setListaTiposVehiculosSalientes(List<TotalVehiculosDTO> listaTiposVehiculosSalientes) {
-        this.listaTiposVehiculosSalientes = listaTiposVehiculosSalientes;
-    }
-
-    public List<TotalVehiculosDTO> getListaTiposVehiculosParqueadero() {
-        return listaTiposVehiculosParqueadero;
-    }
-
-    public void setListaTiposVehiculosParqueadero(List<TotalVehiculosDTO> listaTiposVehiculosParqueadero) {
-        this.listaTiposVehiculosParqueadero = listaTiposVehiculosParqueadero;
+    public void setDetallesPorParqueadero(Map<String, DetalleParqueaderoCierre> detallesPorParqueadero) {
+        this.detallesPorParqueadero = detallesPorParqueadero;
     }
 }

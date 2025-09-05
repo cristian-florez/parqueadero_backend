@@ -32,17 +32,21 @@ public class Ticket {
     @JoinColumn(name = "usuario_entrego_id")
     private Usuario usuarioEntrego;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "vehiculo_id")
     private Vehiculo vehiculo;
 
     @OneToOne(mappedBy = "ticket", cascade = CascadeType.ALL)
     private Pago pago;
 
+    @ManyToOne
+    @JoinColumn(name = "parqueadero_id", nullable = false)
+    private Parqueadero parqueadero;
+
     public Ticket() {
     }
 
-    public Ticket(String codigo, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida, Vehiculo vehiculo, Pago pago, Usuario usuarioRecibio, Usuario usuarioEntrego) {
+    public Ticket(String codigo, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida, Vehiculo vehiculo, Pago pago, Usuario usuarioRecibio, Usuario usuarioEntrego, Parqueadero parqueadero) {
         this.codigo = codigo;
         this.fechaHoraEntrada = fechaHoraEntrada;
         this.fechaHoraSalida = fechaHoraSalida;
@@ -50,9 +54,10 @@ public class Ticket {
         this.pago = pago;
         this.usuarioRecibio = usuarioRecibio;
         this.usuarioEntrego = usuarioEntrego;
+        this.parqueadero = parqueadero;
     }
 
-    public Ticket(Long id, String codigo, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida, Boolean pagado, Vehiculo vehiculo, Pago pago, Usuario usuarioRecibio, Usuario usuarioEntrego) {
+    public Ticket(Long id, String codigo, LocalDateTime fechaHoraEntrada, LocalDateTime fechaHoraSalida, Vehiculo vehiculo, Pago pago, Usuario usuarioRecibio, Usuario usuarioEntrego, Parqueadero parqueadero) {
         this.id = id;
         this.codigo = codigo;
         this.fechaHoraEntrada = fechaHoraEntrada;
@@ -61,6 +66,7 @@ public class Ticket {
         this.pago = pago;
         this.usuarioRecibio = usuarioRecibio;
         this.usuarioEntrego = usuarioEntrego;
+        this.parqueadero = parqueadero;
     }
 
     public Long getId() {
@@ -125,5 +131,13 @@ public class Ticket {
 
     public void setPago(Pago pago) {
         this.pago = pago;
-    }  
+    }
+
+    public Parqueadero getParqueadero() {
+        return parqueadero;
+    }
+
+    public void setParqueadero(Parqueadero parqueadero) {
+        this.parqueadero = parqueadero;
+    }
 }

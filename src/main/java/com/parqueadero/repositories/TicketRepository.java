@@ -19,76 +19,34 @@ public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecif
        // Busca un ticket por su código de barras QR
        Ticket findByCodigo(String codigoBarras);
 
-       // trae la cantidad de vehículos que entraron en un rango de fechas,
-       // agrupados por tipo de vehículo (carro, moto, etc.)
-       @Query("SELECT new com.parqueadero.dtos.vehiculos.TotalVehiculosDTO(v.tipo, COUNT(v.tipo)) " +
-                     "FROM Ticket t JOIN t.vehiculo v " +
-                     "WHERE t.fechaHoraEntrada BETWEEN :fechaInicio AND :fechaFin " +
-                     "GROUP BY v.tipo")
-       List<TotalVehiculosDTO> findTotalVehiculosEntrantes(
-                     @Param("fechaInicio") LocalDateTime fechaInicio,
-                     @Param("fechaFin") LocalDateTime fechaFin);
+    /**
+     * Obtiene TODOS los tickets financieramente relevantes para un turno.
+     * Un ticket es relevante si:
+     * 1. El vehículo ENTRÓ durante el turno.
+     * 2. El vehículo SALIÓ durante el turno.
+     * 3. El PAGO se realizó durante el turno (clave para mensualidades).
+     * Se usa JOIN FETCH para optimizar y traer todas las entidades relacionadas.
+     */
+    @Query("SELECT DISTINCT t FROM Ticket t " +
+            "LEFT JOIN FETCH t.vehiculo " +
+            "LEFT JOIN FETCH t.parqueadero " +
+            "LEFT JOIN FETCH t.pago p " +
+            "WHERE (t.fechaHoraEntrada BETWEEN :fechaInicio AND :fechaFin) " +
+            "OR (t.fechaHoraSalida BETWEEN :fechaInicio AND :fechaFin) " +
+            "OR (p.fechaHora BETWEEN :fechaInicio AND :fechaFin)")
+    List<Ticket> findTicketsParaCierre(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin
+    );
 
-       // trae la cantidad de vehículos que salieron en un rango de fechas,
-       // agrupados por tipo de vehículo
-       @Query("SELECT new com.parqueadero.dtos.vehiculos.TotalVehiculosDTO(v.tipo, COUNT(v.tipo)) " +
-                     "FROM Ticket t " +
-                     "JOIN t.vehiculo v " +
-                     "WHERE t.fechaHoraEntrada IS NOT NULL " +
-                     "AND t.fechaHoraSalida IS NOT NULL " +
-                     "AND t.fechaHoraSalida BETWEEN :fechaInicio AND :fechaFin " +
-                     "GROUP BY v.tipo")
-       List<TotalVehiculosDTO> findTotalVehiculosSalientes(
-                     @Param("fechaInicio") LocalDateTime fechaInicio,
-                     @Param("fechaFin") LocalDateTime fechaFin);
-
-       // obtenemos el total de vehiculos en el parqueadero
-       // agrupado por tipo de vehiculo
-       @Query("SELECT new com.parqueadero.dtos.vehiculos.TotalVehiculosDTO(v.tipo, COUNT(v.tipo)) " +
-                     "FROM Ticket t " +
-                     "JOIN t.vehiculo v " +
-                     "JOIN t.pago p " +
-                     "WHERE p.estado = false " +
-                     "GROUP BY v.tipo")
-       List<TotalVehiculosDTO> findTotalVehiculosParqueadero();
-
-       //trae la lista de los vehiculos en parqueadero
-       @Query("SELECT v " +
-                     "FROM Ticket t " +
-                     "JOIN t.vehiculo v " +
-                     "JOIN t.pago p " +
-                     "WHERE p.estado = false")
-       List<Vehiculo> findVehiculosEnParqueadero();
-
-       // Devuelve los vehículos que entraron en un rango de fechas y aún no tienen
-       // salida
-       @Query("SELECT t.vehiculo FROM Ticket t " +
-                     "WHERE t.fechaHoraEntrada BETWEEN :fechaInicio AND :fechaFin ")
-       List<Vehiculo> vehiculosQueEntraron(
-                     @Param("fechaInicio") LocalDateTime fechaInicio,
-                     @Param("fechaFin") LocalDateTime fechaFin);
-
-       // Devuelve los vehículos que salieron dentro del turno (rango de fechas)
-       @Query("SELECT t.vehiculo FROM Ticket t " +
-                     "WHERE t.fechaHoraSalida BETWEEN :fechaInicioTurno AND :fechaCierreTurno")
-       List<Vehiculo> vehiculosQueSalieron(
-                     @Param("fechaInicioTurno") LocalDateTime fechaInicioTurno,
-                     @Param("fechaCierreTurno") LocalDateTime fechaCierreTurno);
-
-       // Suma el total de pagos de los tickets que entraron durante un turno (rango de
-       // fechas)
-       @Query("SELECT SUM(p.total) " +
-                     "FROM Ticket t " +
-                     "JOIN t.pago p " +
-                     "JOIN t.vehiculo v " +
-                     "WHERE " +
-                     " (p.fechaHora BETWEEN :fechaInicioTurno AND :fechaCierreTurno) " +
-                     " OR " +
-                     " (v.placa LIKE CONCAT('%', :mensualidad, '%') " +
-                     "  AND p.fechaHora BETWEEN :fechaInicioTurno AND :fechaCierreTurno)")
-       Integer totalCierreTurno(
-                     @Param("fechaInicioTurno") LocalDateTime fechaInicioTurno,
-                     @Param("fechaCierreTurno") LocalDateTime fechaCierreTurno,
-                     @Param("mensualidad") String mensualidad);
+    /**
+     * Obtiene todos los tickets de vehículos que están actualmente dentro del parqueadero.
+     * Es necesaria para el "inventario" de vehículos restantes.
+     */
+    @Query("SELECT t FROM Ticket t " +
+            "LEFT JOIN FETCH t.vehiculo " +
+            "LEFT JOIN FETCH t.parqueadero " +
+            "WHERE t.pago.estado = false")
+    List<Ticket> findTicketsAbiertos();
 
 }
