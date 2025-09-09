@@ -69,11 +69,17 @@
 			<version>${mapstruct.version}</version>
 		</dependency>
 
-		<!-- Springdoc OpenAPI (Swagger UI) -->
+		<!-- Scalar -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
 			<version>2.6.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.scalar.maven</groupId>
+			<artifactId>scalar</artifactId>
+			<version>0.1.0</version>
 		</dependency>
 
 		<!-- Test -->

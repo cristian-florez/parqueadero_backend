@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import com.parqueadero.models.Tarifa;
 
+import java.util.List;
+
 @Repository
 public interface TarifaRepository extends JpaRepository<Tarifa, Long> {
 
@@ -13,4 +15,7 @@ public interface TarifaRepository extends JpaRepository<Tarifa, Long> {
 
     @Query("SELECT t.precioDia FROM Tarifa t WHERE t.tipoVehiculo = :tipoVehiculo")
     Integer findPrecioByTipoVehiculo(String tipoVehiculo);
+
+    @Query("SELECT DISTINCT t.tipoVehiculo FROM Tarifa t")
+    List<String> findDistinctTipoVehiculo();
 }

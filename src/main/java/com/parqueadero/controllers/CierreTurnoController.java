@@ -1,8 +1,6 @@
 package com.parqueadero.controllers;
 
-import com.parqueadero.dtos.cierreTurno.CierreReimpresionResponse;
-import com.parqueadero.dtos.cierreTurno.TicketCierreResponse;
-import com.parqueadero.dtos.cierreTurno.TicketCierreTurno;
+import com.parqueadero.dtos.cierreTurno.TicketCierreTurnoResponse;
 import com.parqueadero.mappers.CierreTurnoMapper;
 import com.parqueadero.models.CierreTurno;
 import com.parqueadero.services.CierreTurnoService;
@@ -15,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @RestController
 @RequestMapping("/api/cierre")
@@ -30,7 +32,7 @@ public class CierreTurnoController {
     @PostMapping("/{idUsuario}")
     public ResponseEntity<?> crearCierre(@PathVariable Long idUsuario) {
         try {
-            TicketCierreTurno ticket = cierreTurnoService.crearYGuardarCierre(idUsuario);
+            TicketCierreTurnoResponse ticket = cierreTurnoService.crearYGuardarCierre(idUsuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -42,9 +44,9 @@ public class CierreTurnoController {
     // Listar todos los cierres (con paginación y filtros opcionales)
     @GetMapping
     public ResponseEntity<?> obtenerTodos(
-            Pageable pageable,
-            @RequestParam(required = false) LocalDateTime inicio,
-            @RequestParam(required = false) LocalDateTime fin,
+            @PageableDefault(size = 10, sort = "fechaFinTurno", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fin,
             @RequestParam(required = false) String usuario) {
 
         try {
@@ -54,7 +56,7 @@ public class CierreTurnoController {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay cierres disponibles");
             }
 
-            Page<TicketCierreResponse> response = page.map(cierreTurnoMapper::toResponse);
+            Page<TicketCierreTurnoResponse> response = page.map(cierreTurnoMapper::toResponse);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al obtener cierres: " + e.getMessage());
@@ -66,7 +68,7 @@ public class CierreTurnoController {
     public ResponseEntity<?> obtenerCierrePorId(@PathVariable Long id) {
         try {
             CierreTurno cierre = cierreTurnoService.obtenerCierrePorId(id);
-            CierreReimpresionResponse response = cierreTurnoMapper.toReimpresionResponse(cierre);
+            TicketCierreTurnoResponse response = cierreTurnoMapper.toResponse(cierre);
             return ResponseEntity.ok(response);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

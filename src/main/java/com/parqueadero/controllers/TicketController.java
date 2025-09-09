@@ -19,6 +19,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -33,11 +35,10 @@ public class TicketController {
     // Buscar todos los tickets
     @GetMapping
     public ResponseEntity<?> obtenerTodosLosTickets(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @PageableDefault(size = 10, sort = "fechaHoraEntrada", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false) String codigo,
             @RequestParam(required = false) String placa,
-            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String tipoVehiculo,
             @RequestParam(required = false) String usuarioRecibio,
             @RequestParam(required = false) String usuarioEntrego,
             @RequestParam(required = false) String parqueadero,
@@ -45,9 +46,8 @@ public class TicketController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
             @RequestParam(required = false) Boolean pagado) {
         try {
-            Pageable pageable = PageRequest.of(page, size);
             Page<Ticket> tickets = ticketService.buscarTodos(
-                    pageable, codigo, placa, tipo, usuarioRecibio, usuarioEntrego, fechaInicio, fechaFin, pagado, parqueadero);
+                    pageable, codigo, placa, tipoVehiculo, usuarioRecibio, usuarioEntrego, fechaInicio, fechaFin, pagado, parqueadero);
 
             if (tickets.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay tickets disponibles");

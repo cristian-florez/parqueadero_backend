@@ -3,8 +3,7 @@ package com.parqueadero.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.parqueadero.dtos.cierreTurno.TicketCierreTurno;
-import com.parqueadero.dtos.vehiculos.TotalVehiculosDTO;
+import com.parqueadero.dtos.cierreTurno.TicketCierreTurnoResponse;
 import com.parqueadero.models.CierreTurno;
 import com.parqueadero.models.Usuario;
 import com.parqueadero.repositories.CierreTurnoRepository;
@@ -16,9 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class CierreTurnoService {
@@ -33,22 +30,22 @@ public class CierreTurnoService {
     private UsuarioService usuarioService;
 
     // logica para crear un ticket de cierre de turno
-    public TicketCierreTurno ticketCierreTurno(long idUsuarioLogueado) {
+    public TicketCierreTurnoResponse ticketCierreTurno(long idUsuarioLogueado) {
 
         Usuario usuario = usuarioService.buscarPorId(idUsuarioLogueado);
 
         LocalDateTime fechaInicio = usuario.getFechaInicioSesion();
         LocalDateTime fechaCierre = LocalDateTime.now();
 
-        TicketCierreTurno cierreTurno = ticketService.generarDatosCierre(fechaInicio, fechaCierre);
+        TicketCierreTurnoResponse cierreTurno = ticketService.generarDatosCierre(fechaInicio, fechaCierre);
 
         return cierreTurno;
     }
 
     @Transactional
-    public TicketCierreTurno crearYGuardarCierre(long idUsuarioLogueado) {
+    public TicketCierreTurnoResponse crearYGuardarCierre(long idUsuarioLogueado) {
 
-        TicketCierreTurno dto = ticketCierreTurno(idUsuarioLogueado);
+        TicketCierreTurnoResponse dto = ticketCierreTurno(idUsuarioLogueado);
         Usuario usuario = usuarioService.buscarPorId(idUsuarioLogueado);
         if (usuario == null) {
             throw new NoSuchElementException("Usuario en ticket cierre con ID " + idUsuarioLogueado + " no encontrado");
@@ -90,7 +87,7 @@ public class CierreTurnoService {
 
     // este metodo se creo para que la lista que obtengo de mi ticketCierre
     //lo puedo convertir en un json
-    private String convertirDetallesAJson(TicketCierreTurno dto) {
+    private String convertirDetallesAJson(TicketCierreTurnoResponse dto) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             // Módulo necesario para que Jackson maneje correctamente fechas como LocalDateTime

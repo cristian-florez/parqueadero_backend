@@ -3,21 +3,33 @@ package com.parqueadero.dtos.cierreTurno;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class TicketCierreTurno {
+public class TicketCierreTurnoResponse {
 
+    private long id;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaCierre;
     private Integer total;
+    private String nombreUsuario;
     private Map<String, DetalleParqueaderoCierre> detallesPorParqueadero;
 
-    public TicketCierreTurno() {
+    public TicketCierreTurnoResponse() {
     }
 
-    public TicketCierreTurno(LocalDateTime fechaInicio, LocalDateTime fechaCierre, Integer total, Map<String, DetalleParqueaderoCierre> detallesPorParqueadero) {
+    public TicketCierreTurnoResponse(long id, LocalDateTime fechaInicio, LocalDateTime fechaCierre, Integer total, String nombreUsuario, Map<String, DetalleParqueaderoCierre> detallesPorParqueadero) {
+        this.id = id;
         this.fechaInicio = fechaInicio;
         this.fechaCierre = fechaCierre;
         this.total = total;
+        this.nombreUsuario = nombreUsuario;
         this.detallesPorParqueadero = detallesPorParqueadero;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public LocalDateTime getFechaInicio() {
@@ -42,6 +54,14 @@ public class TicketCierreTurno {
 
     public void setTotal(Integer total) {
         this.total = total;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     public Map<String, DetalleParqueaderoCierre> getDetallesPorParqueadero() {

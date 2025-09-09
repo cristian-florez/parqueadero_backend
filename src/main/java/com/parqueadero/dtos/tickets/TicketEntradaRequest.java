@@ -10,10 +10,11 @@ public class TicketEntradaRequest {
     public TicketEntradaRequest() {
     }
 
-    public TicketEntradaRequest(String placa, String tipoVehiculo, long usuarioRecibioId) {
+    public TicketEntradaRequest(String placa, String tipoVehiculo, long usuarioRecibioId, String parqueadero) {
         this.placa = placa;
         this.tipoVehiculo = tipoVehiculo;
         this.usuarioRecibioId = usuarioRecibioId;
+        this.parqueadero = parqueadero;
     }
 
     public String getPlaca() {
