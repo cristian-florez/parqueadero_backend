@@ -1,6 +1,7 @@
 package com.parqueadero.dtos.cierreTurno;
 
 import com.parqueadero.dtos.vehiculos.TotalVehiculosDTO;
+import com.parqueadero.dtos.vehiculos.VehiculoCierreDTO;
 import com.parqueadero.models.Vehiculo;
 
 import java.util.List;
@@ -8,9 +9,9 @@ import java.util.List;
 public class DetalleParqueaderoCierre {
 
     private List<Vehiculo> listaVehiculosEntrantes;
-    private List<Vehiculo> listaVehiculosSalientes;
+    private List<VehiculoCierreDTO> listaVehiculosSalientes;
     private Integer totalAPagar;
-    private List<Vehiculo> vehiculosMensualidad;
+    private List<VehiculoCierreDTO> vehiculosMensualidad;
     private List<Vehiculo> vehiculosEnParqueadero;
     private List<TotalVehiculosDTO> listaTiposVehiculosEntrantes;
     private List<TotalVehiculosDTO> listaTiposVehiculosSalientes;
@@ -26,11 +27,11 @@ public class DetalleParqueaderoCierre {
         this.listaVehiculosEntrantes = listaVehiculosEntrantes;
     }
 
-    public List<Vehiculo> getListaVehiculosSalientes() {
+    public List<VehiculoCierreDTO> getListaVehiculosSalientes() {
         return listaVehiculosSalientes;
     }
 
-    public void setListaVehiculosSalientes(List<Vehiculo> listaVehiculosSalientes) {
+    public void setListaVehiculosSalientes(List<VehiculoCierreDTO> listaVehiculosSalientes) {
         this.listaVehiculosSalientes = listaVehiculosSalientes;
     }
 
@@ -50,11 +51,11 @@ public class DetalleParqueaderoCierre {
         this.vehiculosEnParqueadero = vehiculosEnParqueadero;
     }
 
-    public List<Vehiculo> getVehiculosMensualidad() {
+    public List<VehiculoCierreDTO> getVehiculosMensualidad() {
         return vehiculosMensualidad;
     }
 
-    public void setVehiculosMensualidad(List<Vehiculo> vehiculosMensualidad) {
+    public void setVehiculosMensualidad(List<VehiculoCierreDTO> vehiculosMensualidad) {
         this.vehiculosMensualidad = vehiculosMensualidad;
     }
 

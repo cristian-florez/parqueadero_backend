@@ -2,6 +2,7 @@ package com.parqueadero.mappers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.parqueadero.dtos.cierreTurno.DetalleParqueaderoCierre;
 import com.parqueadero.dtos.cierreTurno.TicketCierreTurnoResponse;
 import com.parqueadero.models.CierreTurno;

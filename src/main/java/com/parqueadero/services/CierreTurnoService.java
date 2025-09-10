@@ -51,27 +51,26 @@ public class CierreTurnoService {
             throw new NoSuchElementException("Usuario en ticket cierre con ID " + idUsuarioLogueado + " no encontrado");
         }
 
-        // mapeamos el ticketCierre con el modelo para poder crear registro en la bd
-        CierreTurno nuevoCierre = new CierreTurno();
-
         if (dto.getFechaInicio() == null) {
             throw new NoSuchElementException("el usuario no registra fecha de inicio de turno");
         }
+
+        dto.setNombreUsuario(usuario.getNombre());
+
+        CierreTurno nuevoCierre = new CierreTurno();
         nuevoCierre.setFechaInicioTurno(dto.getFechaInicio());
         nuevoCierre.setFechaFinTurno(dto.getFechaCierre());
         nuevoCierre.setNombreUsuario(usuario.getNombre());
         nuevoCierre.setTotalIngresos(dto.getTotal());
-
         nuevoCierre.setDetallesJson(convertirDetallesAJson(dto));
 
         usuarioService.eliminarFechaInicioSesion(usuario);
 
-
         cierreTurnoRepository.save(nuevoCierre);
 
-        // Retornar DTO (para frontend)
         return dto;
     }
+
 
     public Page<CierreTurno> obtenerTodosLosCierres(Pageable pageable, LocalDateTime inicio, LocalDateTime fin,
                                                     String nombreUsuario) {

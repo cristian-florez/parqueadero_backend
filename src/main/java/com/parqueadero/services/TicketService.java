@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.parqueadero.dtos.cierreTurno.DetalleParqueaderoCierre;
 import com.parqueadero.dtos.vehiculos.TotalVehiculosDTO;
+import com.parqueadero.dtos.vehiculos.VehiculoCierreDTO;
 import com.parqueadero.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -235,13 +236,21 @@ public class TicketService {
                     entrantes.stream().map(Ticket::getVehiculo).collect(Collectors.toList())
             );
             detalle.setListaVehiculosSalientes(
-                    salientes.stream().map(Ticket::getVehiculo).collect(Collectors.toList())
+                    salientes.stream().map(ticket -> new VehiculoCierreDTO(
+                            ticket.getVehiculo().getPlaca(),
+                            ticket.getVehiculo().getTipo(),
+                            ticket.getPago().getTotal()
+                    )).collect(Collectors.toList())
             );
             detalle.setVehiculosEnParqueadero(
                     dentroParqueadero.stream().map(Ticket::getVehiculo).collect(Collectors.toList())
             );
             detalle.setVehiculosMensualidad(
-                    mensualidad.stream().map(Ticket::getVehiculo).collect(Collectors.toList())
+                    mensualidad.stream().map(ticket -> new VehiculoCierreDTO(
+                            ticket.getVehiculo().getPlaca(),
+                            ticket.getVehiculo().getTipo(),
+                            ticket.getPago().getTotal()
+                    )).collect(Collectors.toList())
             );
 
             // --- C. Calcular el total pagado en el turno para este parqueadero ---
