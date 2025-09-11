@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -44,7 +45,9 @@ public class UsuarioService {
         Usuario usuarioModel = usuarioRepository.findByNombreAndCedula(usuario.getNombre(), usuario.getCedula());
 
         if (usuarioModel != null) {
-            usuarioModel.setFechaInicioSesion(LocalDateTime.now());
+            if (Objects.isNull(usuarioModel.getFechaInicioSesion())) {
+                usuarioModel.setFechaInicioSesion(LocalDateTime.now());
+            }
             usuarioRepository.save(usuarioModel);
             return Optional.of(usuarioModel);
         }
@@ -55,6 +58,10 @@ public class UsuarioService {
 
         usuario.setFechaInicioSesion(null);
         return usuarioRepository.save(usuario);
+    }
+
+    public Boolean masInicioSesion(String cedula) {
+        return usuarioRepository.existsByCedulaNotAndFechaInicioSesionIsNotNull(cedula);
     }
 
 }

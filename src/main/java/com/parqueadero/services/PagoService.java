@@ -57,7 +57,7 @@ public class PagoService {
 
         long minutos = Duration.between(ticket.getFechaHoraEntrada(), LocalDateTime.now()).toMinutes();
         long horas = (long) Math.ceil(minutos / 60.0);
-        int bloques = (int) Math.ceil(horas / 12.0);
+        int bloques = (int) Math.ceil(horas / 24.0);
 
         Integer total = (bloques == 0) ? tarifa : bloques * tarifa;
 

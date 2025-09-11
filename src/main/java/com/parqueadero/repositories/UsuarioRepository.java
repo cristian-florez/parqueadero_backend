@@ -16,4 +16,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("SELECT DISTINCT u.nombre FROM Usuario u")
     List<String> findDistinctNombres();
+
+    boolean existsByCedulaNotAndFechaInicioSesionIsNotNull(String cedula);
 }

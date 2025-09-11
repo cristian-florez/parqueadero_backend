@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.Security;
 
+//comentar esta linea al momento de desarrollar
 @Configuration
 public class QzKeyConfig {
 

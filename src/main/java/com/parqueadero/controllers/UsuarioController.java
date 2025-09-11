@@ -59,13 +59,23 @@ public class UsuarioController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UsuarioLogin usuario) {
         try {
+            // Primero verificas si ya hay sesión activa
+            if (usuarioService.masInicioSesion(usuario.getCedula())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Ya existe un turno activo para este usuario");
+            }
+
+            // Si no hay sesión activa, validas las credenciales
             return usuarioService.login(usuario)
                     .<ResponseEntity<?>>map(ResponseEntity::ok)
                     .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                             .body("Credenciales incorrectas o usuario no encontrado"));
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error en login: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error en login: " + e.getMessage());
         }
     }
+
 
 }

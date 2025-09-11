@@ -74,9 +74,12 @@ public class CierreTurnoService {
 
     public Page<CierreTurno> obtenerTodosLosCierres(Pageable pageable, LocalDateTime inicio, LocalDateTime fin,
                                                     String nombreUsuario) {
-        Specification<CierreTurno> spec = Specification
-                .where(CierreTurnoSpecification.fechaCreacionBetween(inicio, fin))
-                .and(CierreTurnoSpecification.hasNombreUsuario(nombreUsuario));
+
+        Specification<CierreTurno> spec = Specification.allOf(
+                CierreTurnoSpecification.fechaCreacionBetween(inicio, fin),
+                CierreTurnoSpecification.hasNombreUsuario(nombreUsuario)
+        );
+
         return cierreTurnoRepository.findAll(spec, pageable);
     }
 
